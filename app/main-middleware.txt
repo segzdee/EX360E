@@ -1,0 +1,36 @@
+// src/middleware.ts
+import { NextResponse } from 'next/server'
+import type { NextRequest } from 'next/server'
+import { authMiddleware } from './middleware/auth'
+import { rbacMiddleware } from './middleware/rbac'
+import { rateLimitMiddleware } from './middleware/rateLimit'
+import { loggingMiddleware } from './middleware/logging'
+
+// Paths that should skip middleware processing
+const SKIP_PATHS = [
+  '/_next',
+  '/static',
+  '/images',
+  '/favicon.ico',
+  '/manifest.json',
+  '/robots.txt',
+]
+
+export async function middleware(req: NextRequest) {
+  try {
+    // Skip middleware for static files and public assets
+    if (SKIP_PATHS.some(path => req.nextUrl.pathname.startsWith(path))) {
+      return NextResponse.next()
+    }
+
+    // Start logging
+    const logResponse = await loggingMiddleware(req)
+    if (logResponse.status !== 200) return logResponse
+
+    // Check rate limiting
+    const rateLimitResponse = rateLimitMiddleware(req)
+    if (rateLimitResponse.status !== 200) return rateLimitResponse
+
+    // Authenticate user
+    const authResponse = await authMiddleware(req)
+    if (authResponse

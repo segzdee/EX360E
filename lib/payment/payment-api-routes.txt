@@ -1,0 +1,59 @@
+// app/api/payments/stripe/webhook/route.ts
+import { NextResponse } from 'next/server';
+import Stripe from 'stripe';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
+import { PAYMENT_CONFIG } from '@/config/payment';
+
+const stripe = new Stripe(PAYMENT_CONFIG.stripe.secretKey!, {
+  apiVersion: '2023-10-16'
+});
+
+export async function POST(request: Request) {
+  const body = await request.text();
+  const signature = request.headers.get('stripe-signature')!;
+
+  let event: Stripe.Event;
+
+  try {
+    event = stripe.webhooks.constructEvent(
+      body,
+      signature,
+      PAYMENT_CONFIG.stripe.webhookSecret!
+    );
+  } catch (error) {
+    return new NextResponse('Webhook error', { status: 400 });
+  }
+
+  const supabase = createRouteHandlerClient({ cookies });
+
+  switch (event.type) {
+    case 'payment_intent.succeeded':
+      const paymentIntent = event.data.object as Stripe.PaymentIntent;
+      await handleSuccessfulPayment(supabase, paymentIntent);
+      break;
+
+    case 'payment_intent.payment_failed':
+      const failedPayment = event.data.object as Stripe.PaymentIntent;
+      await handleFailedPayment(supabase, failedPayment);
+      break;
+  }
+
+  return new NextResponse(null, { status: 200 });
+}
+
+// app/api/payments/crypto/webhook/route.ts
+import { CoinbaseCommerce } from 'coinbase-commerce-node';
+
+export async function POST(request: Request) {
+  const body = await request.text();
+  const signature = request.headers.get('x-cc-webhook-signature')!;
+
+  try {
+    const event = CoinbaseCommerce.Webhook.verifyEventBody(
+      body,
+      signature,
+      PAYMENT_CONFIG.crypto.providers.coinbase.webhookSecret!
+    );
+
+    const supabase = createRou

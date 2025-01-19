@@ -1,0 +1,81 @@
+// app/shifts/page.tsx
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useAuth } from '@/context/AuthContext'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+
+export default function ShiftsPage() {
+  const { user, profile } = useAuth()
+  const [shifts, setShifts] = useState([])
+  const supabase = createClientComponentClient()
+
+  useEffect(() => {
+    const fetchShifts = async () => {
+      const { data, error } = await supabase
+        .from('shifts')
+        .select('*')
+        .eq('status', 'open')
+        .order('start_time', { ascending: true })
+
+      if (!error) {
+        setShifts(data)
+      }
+    }
+
+    fetchShifts()
+  }, [])
+
+  return (
+    <div className="p-6">
+      <h1 className="text-2xl font-bold mb-6">Available Shifts</h1>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {shifts.map((shift: any) => (
+          <div key={shift.id} className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-xl font-semibold mb-2">{shift.title}</h2>
+            <p className="text-gray-600 mb-4">{shift.description}</p>
+            <div className="space-y-2">
+              <p>
+                <span className="font-medium">Date: </span>
+                {new Date(shift.start_time).toLocaleDateString()}
+              </p>
+              <p>
+                <span className="font-medium">Time: </span>
+                {new Date(shift.start_time).toLocaleTimeString()} - 
+                {new Date(shift.end_time).toLocaleTimeString()}
+              </p>
+              <p>
+                <span className="font-medium">Rate: </span>
+                ${shift.hourly_rate}/hour
+              </p>
+            </div>
+            <button className="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+              Apply Now
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// app/profile/page.tsx
+'use client'
+
+import { useEffect, useState } from 'react'
+import { useAuth } from '@/context/AuthContext'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+
+export default function ProfilePage() {
+  const { user, profile } = useAuth()
+  const [formData, setFormData] = useState({
+    full_name: '',
+    phone: '',
+    skills: [],
+    certifications: [],
+    hourly_rate: ''
+  })
+  const [isEditing, setIsEditing] = useState(false)
+  const supabase = createClientComponentClient()
+
+  useEffect

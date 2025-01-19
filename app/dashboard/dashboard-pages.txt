@@ -1,0 +1,144 @@
+// app/dashboard/page.tsx
+'use client'
+
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/context/AuthContext'
+
+export default function DashboardPage() {
+  const router = useRouter()
+  const { user, profile, isLoading } = useAuth()
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push('/auth/login')
+      return
+    }
+
+    if (profile?.role) {
+      switch (profile.role) {
+        case 'company':
+          router.push('/dashboard/client')
+          break
+        case 'freelancer':
+          router.push('/dashboard/staff')
+          break
+        case 'recruiter':
+          router.push('/dashboard/agency')
+          break
+      }
+    }
+  }, [user, profile, isLoading, router])
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">Loading...</div>
+      </div>
+    )
+  }
+
+  return null
+}
+
+// app/dashboard/staff/page.tsx
+'use client'
+
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/context/AuthContext'
+import FreelancerDashboard from '@/components/FreelancerDashboard'
+
+export default function StaffDashboardPage() {
+  const router = useRouter()
+  const { user, profile, isLoading } = useAuth()
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push('/auth/login')
+      return
+    }
+
+    if (profile?.role !== 'freelancer') {
+      router.push('/dashboard')
+    }
+  }, [user, profile, isLoading, router])
+
+  if (isLoading) {
+    return <div>Loading...</div>
+  }
+
+  if (!user || profile?.role !== 'freelancer') {
+    return null
+  }
+
+  return <FreelancerDashboard />
+}
+
+// app/dashboard/client/page.tsx
+'use client'
+
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/context/AuthContext'
+import ClientDashboard from '@/components/ClientDashboard'
+
+export default function ClientDashboardPage() {
+  const router = useRouter()
+  const { user, profile, isLoading } = useAuth()
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push('/auth/login')
+      return
+    }
+
+    if (profile?.role !== 'company') {
+      router.push('/dashboard')
+    }
+  }, [user, profile, isLoading, router])
+
+  if (isLoading) {
+    return <div>Loading...</div>
+  }
+
+  if (!user || profile?.role !== 'company') {
+    return null
+  }
+
+  return <ClientDashboard />
+}
+
+// app/dashboard/agency/page.tsx
+'use client'
+
+import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { useAuth } from '@/context/AuthContext'
+import AgencyDashboard from '@/components/AgencyDashboard'
+
+export default function AgencyDashboardPage() {
+  const router = useRouter()
+  const { user, profile, isLoading } = useAuth()
+
+  useEffect(() => {
+    if (!isLoading && !user) {
+      router.push('/auth/login')
+      return
+    }
+
+    if (profile?.role !== 'recruiter') {
+      router.push('/dashboard')
+    }
+  }, [user, profile, isLoading, router])
+
+  if (isLoading) {
+    return <div>Loading...</div>
+  }
+
+  if (!user || profile?.role !== 'recruiter') {
+    return null
+  }
+
+  return <AgencyDashboard />
+}

@@ -1,0 +1,154 @@
+// components/dashboard/company/Analytics.tsx
+'use client'
+
+import { useState, useEffect } from 'react'
+import { Card } from '@/components/ui/card'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
+
+export function Analytics() {
+  const [metrics, setMetrics] = useState({
+    totalShifts: 0,
+    totalSpent: 0,
+    averageRating: 0,
+    staffUtilization: 0,
+    monthlyData: [],
+  })
+  const supabase = createClientComponentClient()
+
+  useEffect(() => {
+    fetchAnalytics()
+  }, [])
+
+  const fetchAnalytics = async () => {
+    try {
+      // Fetch shifts data
+      const { data: shifts } = await supabase
+        .from('shifts')
+        .select(`
+          *,
+          shift_assignments(
+            freelancer:freelancers(average_rating)
+          )
+        `)
+        .order('start_time', { ascending: true })
+
+      // Calculate metrics
+      const totalShifts = shifts?.length || 0
+      const totalSpent = shifts?.reduce((acc, shift) => {
+        const hours = (new Date(shift.end_time).getTime() - new Date(shift.start_time).getTime()) / (1000 * 60 * 60)
+        return acc + (hours * shift.hourly_rate)
+      }, 0) || 0
+
+      const ratings = shifts?.flatMap(s => 
+        s.shift_assignments?.map(a => a.freelancer?.average_rating) || []
+      ).filter(Boolean)
+      const averageRating = ratings.length > 0 
+        ? ratings.reduce((a, b) => a + b) / ratings.length 
+        : 0
+
+      // Calculate monthly data
+      const monthlyData = shifts?.reduce((acc, shift) => {
+        const month = new Date(shift.start_time).toLocaleString('default', { month: 'short' })
+        const existingMonth = acc.find(m => m.month === month)
+        if (existingMonth) {
+          existingMonth.shifts += 1
+          const hours = (new Date(shift.end_time).getTime() - new Date(shift.start_time).getTime()) / (1000 * 60 * 60)
+          existingMonth.spent += hours * shift.hourly_rate
+        } else {
+          const hours = (new Date(shift.end_time).getTime() - new Date(shift.start_time).getTime()) / (1000 * 60 * 60)
+          acc.push({
+            month,
+            shifts: 1,
+            spent: hours * shift.hourly_rate
+          })
+        }
+        return acc
+      }, []) || []
+
+      setMetrics({
+        totalShifts,
+        totalSpent,
+        averageRating,
+        staffUtilization: (shifts?.filter(s => s.status === 'completed').length / totalShifts) * 100,
+        monthlyData,
+      })
+    } catch (error) {
+      console.error('Error fetching analytics:', error)
+    }
+  }
+
+  return (
+    <Card className="p-6">
+      <h2 className="text-xl font-bold mb-6">Analytics & Insights</h2>
+
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        <Card className="p-4">
+          <h3 className="text-sm text-gray-500">Total Shifts</h3>
+          <p className="text-2xl font-bold">{metrics.totalShifts}</p>
+        </Card>
+        <Card className="p-4">
+          <h3 className="text-sm text-gray-500">Total Spent</h3>
+          <p className="text-2xl font-bold">${metrics.totalSpent.toFixed(2)}</p>
+        </Card>
+        <Card className="p-4">
+          <h3 className="text-sm text-gray-500">Average Rating</h3>
+          <p className="text-2xl font-bold">{metrics.averageRating.toFixed(1)}/5.0</p>
+        </Card>
+        <Card className="p-4">
+          <h3 className="text-sm text-gray-500">Staff Utilization</h3>
+          <p className="text-2xl font-bold">{metrics.staffUtilization.toFixed(1)}%</p>
+        </Card>
+      </div>
+
+      <Tabs defaultValue="shifts">
+        <TabsList>
+          <TabsTrigger value="shifts">Shifts Overview</TabsTrigger>
+          <TabsTrigger value="spending">Spending Analysis</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="shifts">
+          <Card className="p-4">
+            <h3 className="font-medium mb-4">Monthly Shifts</h3>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={metrics.monthlyData}>
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="shifts" stroke="#2563eb" />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="spending">
+          <Card className="p-4">
+            <h3 className="font-medium mb-4">Monthly Spending</h3>
+            <div className="h-64">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={metrics.monthlyData}>
+                  <XAxis dataKey="month" />
+                  <YAxis />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="spent" stroke="#2563eb" />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </Card>
+  )
+}
+
+// components/dashboard/company/StaffRatings.tsx
+export function StaffRatings() {
+  const [completedShifts, setCompletedShifts] = useState([])
+  const supabase = createClientComponentClient()
+
+  useEffect(() => {
+    fetchCompletedShifts()
+  }, [])

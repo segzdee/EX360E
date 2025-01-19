@@ -1,0 +1,56 @@
+app/
+├── dashboard/
+│   ├── layout.tsx                # Dashboard layout with navigation
+│   ├── page.tsx                  # Main dashboard router
+│   │
+│   ├── company/                  # Company (Client) Dashboard
+│   │   ├── page.tsx             # Main company dashboard
+│   │   ├── shifts/              # Shift management
+│   │   │   ├── page.tsx         # Shift listing
+│   │   │   ├── create.tsx       # Create shift
+│   │   │   └── [id]/            # Individual shift
+│   │   │       ├── page.tsx     # Shift details
+│   │   │       └── edit.tsx     # Edit shift
+│   │   ├── staff/               # Staff management
+│   │   │   ├── page.tsx         # Staff listing
+│   │   │   └── [id]/            # Individual staff
+│   │   └── finance/             # Financial management
+│   │       ├── page.tsx         # Financial overview
+│   │       └── transactions/     # Transaction history
+│   │
+│   ├── freelancer/              # Freelancer (Staff) Dashboard
+│   │   ├── page.tsx             # Main freelancer dashboard
+│   │   ├── shifts/              # Shift management
+│   │   │   ├── page.tsx         # Available shifts
+│   │   │   ├── active/          # Active shifts
+│   │   │   └── history/         # Shift history
+│   │   ├── availability/        # Availability management
+│   │   │   └── page.tsx         # Set availability
+│   │   ├── profile/             # Profile management
+│   │   │   ├── page.tsx         # View profile
+│   │   │   └── edit.tsx         # Edit profile
+│   │   └── earnings/            # Earnings management
+│   │       ├── page.tsx         # Earnings overview
+│   │       └── withdraw.tsx      # Withdraw earnings
+│   │
+│   └── recruiter/               # Recruiter (Agency) Dashboard
+│       ├── page.tsx             # Main recruiter dashboard
+│       ├── staff/               # Staff management
+│       │   ├── page.tsx         # Staff listing
+│       │   ├── add.tsx          # Add new staff
+│       │   └── [id]/            # Individual staff
+│       ├── clients/             # Client management
+│       │   ├── page.tsx         # Client listing
+│       │   └── [id]/            # Individual client
+│       ├── shifts/              # Shift management
+│       │   ├── page.tsx         # All shifts
+│       │   └── assignments/      # Shift assignments
+│       └── finance/             # Financial management
+│           ├── page.tsx         # Financial overview
+│           └── reports/         # Financial reports
+│
+└── api/                         # API routes for dashboard
+    └── dashboard/
+        ├── company/             # Company API routes
+        ├── freelancer/          # Freelancer API routes
+        └── recruiter/           # Recruiter API routes

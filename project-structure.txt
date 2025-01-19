@@ -1,0 +1,63 @@
+├── app/
+│   ├── (auth)/
+│   │   ├── login/
+│   │   │   └── page.tsx
+│   │   ├── register/
+│   │   │   └── page.tsx
+│   │   └── layout.tsx
+│   ├── (dashboard)/
+│   │   ├── agency/
+│   │   │   └── page.tsx
+│   │   ├── venue/
+│   │   │   └── page.tsx
+│   │   ├── staff/
+│   │   │   └── page.tsx
+│   │   └── layout.tsx
+│   ├── api/
+│   │   ├── auth/
+│   │   │   └── [...nextauth]/
+│   │   │       └── route.ts
+│   │   └── dashboard/
+│   │       └── [userType]/
+│   │           └── route.ts
+│   ├── layout.tsx
+│   └── page.tsx
+├── components/
+│   ├── auth/
+│   │   ├── login-form.tsx
+│   │   └── register-form.tsx
+│   ├── dashboard/
+│   │   ├── agency-dashboard.tsx
+│   │   ├── venue-dashboard.tsx
+│   │   ├── staff-dashboard.tsx
+│   │   └── shared/
+│   │       ├── metrics-card.tsx
+│   │       ├── side-nav.tsx
+│   │       └── chart-container.tsx
+│   ├── shifts/
+│   │   ├── shift-card.tsx
+│   │   ├── shift-form.tsx
+│   │   └── shift-list.tsx
+│   └── ui/
+│       ├── button.tsx
+│       ├── card.tsx
+│       └── input.tsx
+├── lib/
+│   ├── supabase/
+│   │   ├── client.ts
+│   │   ├── server.ts
+│   │   └── database.types.ts
+│   ├── utils/
+│   │   ├── auth.ts
+│   │   ├── date.ts
+│   │   └── format.ts
+│   └── config.ts
+├── types/
+│   ├── auth.ts
+│   ├── dashboard.ts
+│   └── shifts.ts
+├── styles/
+│   └── globals.css
+└── public/
+    ├── images/
+    └── icons/ 

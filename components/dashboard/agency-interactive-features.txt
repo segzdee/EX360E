@@ -1,0 +1,215 @@
+// components/dashboard/agency/StaffAssignment.tsx
+'use client'
+
+import { useState, useEffect } from 'react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+
+interface StaffMember {
+  id: string
+  profiles: { full_name: string }
+  skills: string[]
+  average_rating: number
+  is_available: boolean
+}
+
+export function StaffAssignment({ 
+  shiftId, 
+  requiredSkills,
+  onAssign 
+}: { 
+  shiftId: string
+  requiredSkills: string[]
+  onAssign: () => void
+}) {
+  const [isOpen, setIsOpen] = useState(false)
+  const [availableStaff, setAvailableStaff] = useState<StaffMember[]>([])
+  const [selectedStaff, setSelectedStaff] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const supabase = createClientComponentClient()
+
+  useEffect(() => {
+    const fetchAvailableStaff = async () => {
+      const { data } = await supabase
+        .from('freelancers')
+        .select(`
+          id,
+          profiles (full_name),
+          skills,
+          average_rating,
+          is_available
+        `)
+        .eq('is_available', true)
+        .contains('skills', requiredSkills)
+
+      if (data) {
+        setAvailableStaff(data)
+      }
+    }
+
+    if (isOpen) {
+      fetchAvailableStaff()
+    }
+  }, [isOpen, requiredSkills])
+
+  const handleAssign = async () => {
+    if (!selectedStaff) return
+
+    setIsLoading(true)
+    try {
+      const response = await fetch('/api/agency/assignments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          shiftId,
+          freelancerId: selectedStaff,
+        }),
+      })
+
+      if (!response.ok) throw new Error('Failed to assign staff')
+
+      onAssign()
+      setIsOpen(false)
+    } catch (error) {
+      console.error('Error assigning staff:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <Button onClick={() => setIsOpen(true)}>
+        Assign Staff
+      </Button>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Assign Staff to Shift</DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          <div className="border rounded-lg divide-y">
+            {availableStaff.map((staff) => (
+              <div
+                key={staff.id}
+                className={`p-4 flex items-center justify-between cursor-pointer ${
+                  selectedStaff === staff.id ? 'bg-blue-50' : ''
+                }`}
+                onClick={() => setSelectedStaff(staff.id)}
+              >
+                <div>
+                  <p className="font-medium">{staff.profiles.full_name}</p>
+                  <div className="flex gap-2 mt-1">
+                    {staff.skills.map((skill) => (
+                      <span
+                        key={skill}
+                        className={`text-xs px-2 py-1 rounded ${
+                          requiredSkills.includes(skill)
+                            ? 'bg-green-100 text-green-800'
+                            : 'bg-gray-100 text-gray-800'
+                        }`}
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm text-gray-500">
+                    {staff.average_rating.toFixed(1)} / 5.0
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <Button
+            onClick={handleAssign}
+            disabled={!selectedStaff || isLoading}
+            className="w-full"
+          >
+            {isLoading ? 'Assigning...' : 'Confirm Assignment'}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+// components/dashboard/agency/ShiftFilters.tsx
+'use client'
+
+import { useState } from 'react'
+import { Card } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Button } from '@/components/ui/button'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+
+interface Filters {
+  status: string
+  dateRange: string
+  skillRequirement: string[]
+  hourlyRate: {
+    min: number
+    max: number
+  }
+}
+
+export function ShiftFilters({
+  onFilterChange
+}: {
+  onFilterChange: (filters: Filters) => void
+}) {
+  const [filters, setFilters] = useState<Filters>({
+    status: 'all',
+    dateRange: 'upcoming',
+    skillRequirement: [],
+    hourlyRate: {
+      min: 0,
+      max: 100
+    }
+  })
+
+  const handleFilterChange = (key: keyof Filters, value: any) => {
+    const newFilters = {
+      ...filters,
+      [key]: value
+    }
+    setFilters(newFilters)
+    onFilterChange(newFilters)
+  }
+
+  return (
+    <Card className="p-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div>
+          <Label>Status</Label>
+          <Select
+            value={filters.status}
+            onValueChange={(value) => handleFilterChange('status', value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="open">Open</SelectItem>
+              <SelectItem value="assigned">Assigned</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
+          <Label>Date Range</Label>
+          <Select
+            value={filters.dateRange}
+            onValueChange={(value) => handleFilterChange('dateRange', value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select range" />
+            </SelectTrigger

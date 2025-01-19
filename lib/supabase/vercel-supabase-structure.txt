@@ -1,0 +1,74 @@
+extrastaff360/
+├── app/                           # Next.js App Router
+│   ├── (auth)/                   # Auth routes
+│   │   ├── login/
+│   │   ├── register/
+│   │   └── forgot-password/
+│   ├── dashboard/                # Dashboard routes
+│   │   ├── company/
+│   │   ├── freelancer/
+│   │   └── recruiter/
+│   ├── shifts/                   # Shift management
+│   └── api/                      # API Routes
+│       ├── auth/
+│       ├── shifts/
+│       ├── payments/
+│       ├── wallets/
+│       └── webhooks/
+│
+├── components/                    # React Components
+│   ├── ui/                       # UI Components
+│   ├── forms/                    # Form Components
+│   ├── dashboard/                # Dashboard Components
+│   └── shifts/                   # Shift-related Components
+│
+├── lib/                          # Shared Libraries
+│   ├── supabase/                 # Supabase Configuration
+│   │   ├── client.ts            # Supabase Client
+│   │   ├── admin.ts             # Admin Client
+│   │   └── types.ts             # Database Types
+│   │
+│   ├── payment/                  # Payment Integration
+│   │   ├── stripe.ts
+│   │   ├── crypto.ts
+│   │   └── mobile-money.ts
+│   │
+│   └── utils/                    # Utility Functions
+│
+├── supabase/                     # Supabase Configuration
+│   ├── migrations/               # Database Migrations
+│   │   ├── 00001_users.sql
+│   │   ├── 00002_shifts.sql
+│   │   ├── 00003_payments.sql
+│   │   └── 00004_wallets.sql
+│   │
+│   ├── functions/               # Edge Functions
+│   │   ├── shift-notification/
+│   │   ├── payment-processing/
+│   │   └── rating-calculation/
+│   │
+│   └── seed.sql                 # Seed Data
+│
+├── services/                    # Business Logic
+│   ├── auth/
+│   │   ├── authentication.ts
+│   │   └── authorization.ts
+│   ├── shifts/
+│   │   ├── creation.ts
+│   │   ├── matching.ts
+│   │   └── scheduling.ts
+│   ├── payments/
+│   │   ├── processing.ts
+│   │   └── escrow.ts
+│   └── notifications/
+│       ├── email.ts
+│       └── push.ts
+│
+├── types/                      # TypeScript Types
+│   ├── database.ts
+│   ├── api.ts
+│   └── common.ts
+│
+├── middleware.ts              # Next.js Middleware
+├── next.config.js            # Next.js Config
+└── package.json
