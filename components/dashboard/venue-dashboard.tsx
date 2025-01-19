@@ -3,7 +3,7 @@
 import React from 'react'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
-import { formatCurrency } from '@/lib/supabase/supabase-utils'
+import { formatCurrency } from '@/lib/utils/format-currency'
 import { LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { Building, Users, DollarSign, Clock } from 'lucide-react'
 import type { VenueMetrics } from '@/types/dashboard-types'
@@ -12,10 +12,10 @@ export default function VenueDashboard({ metrics }: { metrics: VenueMetrics }) {
   return (
     <div className="flex gap-4 h-[calc(100vh-4rem)]">
       {/* Side Panel */}
-      <div className="w-64 bg-card p-4 rounded-lg shadow-lg">
+      <aside className="w-64 bg-card p-4 rounded-lg shadow-lg">
         <div className="space-y-6">
           <div className="space-y-2">
-            <h2 className="text-xl font-bold">Venue Dashboard</h2>
+            <h1 className="text-xl font-bold">Venue Dashboard</h1>
             <p className="text-sm text-muted-foreground">Shift Management</p>
           </div>
           
@@ -46,12 +46,12 @@ export default function VenueDashboard({ metrics }: { metrics: VenueMetrics }) {
             </a>
           </nav>
         </div>
-      </div>
+      </aside>
 
       {/* Main Content */}
-      <div className="flex-1 space-y-4" role="main">
+      <main className="flex-1 space-y-4">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4" aria-label="Dashboard statistics">
           <Card className="p-4">
             <div className="flex items-center gap-2">
               <Users className="h-5 w-5 text-muted-foreground" />
@@ -85,7 +85,7 @@ export default function VenueDashboard({ metrics }: { metrics: VenueMetrics }) {
               <h3 className="text-sm font-medium">Venue Status</h3>
             </div>
             <div className="mt-2">
-              <Badge variant={metrics.isActive ? "success" : "destructive"}>
+              <Badge variant={metrics.isActive ? "default" : "destructive"}>
                 {metrics.isActive ? "Active" : "Inactive"}
               </Badge>
             </div>
@@ -94,12 +94,19 @@ export default function VenueDashboard({ metrics }: { metrics: VenueMetrics }) {
 
         {/* Chart */}
         <Card className="p-4">
-          <h3 className="text-lg font-medium mb-4">Shift Distribution</h3>
+          <h2 className="text-lg font-medium mb-4">Shift Distribution</h2>
           <div className="h-[300px]" aria-label="Shift distribution chart">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={metrics.shiftData}>
-                <XAxis dataKey="date" />
-                <YAxis />
+              <LineChart data={metrics.shiftData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                <XAxis 
+                  dataKey="date" 
+                  tick={{ fontSize: 12 }}
+                  aria-label="Date"
+                />
+                <YAxis 
+                  tick={{ fontSize: 12 }}
+                  aria-label="Number of shifts"
+                />
                 <Tooltip />
                 <Line 
                   type="monotone" 
@@ -107,12 +114,13 @@ export default function VenueDashboard({ metrics }: { metrics: VenueMetrics }) {
                   stroke="#8884d8" 
                   strokeWidth={2}
                   dot={{ strokeWidth: 2 }}
+                  name="Shifts"
                 />
               </LineChart>
             </ResponsiveContainer>
           </div>
         </Card>
-      </div>
+      </main>
     </div>
   )
 } 

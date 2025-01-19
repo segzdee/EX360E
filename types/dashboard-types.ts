@@ -20,6 +20,14 @@ export interface VenueMetrics extends BaseMetrics {
   totalSpent: number
   averageRating: number
   regularStaff: number
+  totalStaff: number
+  activeShifts: number
+  monthlyExpenses: number
+  isActive: boolean
+  shiftData: Array<{
+    date: string
+    shifts: number
+  }>
 }
 
 export interface StaffMetrics extends BaseMetrics {

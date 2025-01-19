@@ -1,7 +1,3 @@
-export default function LandingPage() {
-  return (
-    // Your landing page JSX here
-  )
 import React from 'react';
 import { LineChart, Line, XAxis, YAxis } from 'recharts';
 
@@ -69,10 +65,16 @@ export default function DemoPage() {
                 <div className="w-5 h-5 bg-gray-200 rounded"></div>
                 <span>Sign up with Google</span>
               </button>
-
               <div className="flex items-center gap-2">
-                <input type="checkbox" />
-                <label className="text-sm text-gray-500">
+                <input 
+                  type="checkbox"
+                  id="terms-checkbox"
+                  aria-label="Accept terms and privacy policy" 
+                />
+                <label 
+                  htmlFor="terms-checkbox" 
+                  className="text-sm text-gray-500"
+                >
                   I agree to the Terms & Privacy
                 </label>
               </div>
