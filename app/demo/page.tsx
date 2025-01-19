@@ -10,7 +10,7 @@ const monthlyData = [
   { name: 'Jun', value: 48 }
 ];
 
-export default function DemoPage() {
+export default function Demo() {
   return (
     <div className="flex flex-col min-h-screen">
       <div className="flex-grow grid lg:grid-cols-2">
