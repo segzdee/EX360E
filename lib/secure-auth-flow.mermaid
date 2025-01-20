@@ -1,0 +1,100 @@
+flowchart TD
+    Start([Start]) --> LoginChoice{Login Choice}
+    
+    %% Regular Login Path
+    LoginChoice -->|Regular Login| ExistingUser[Enter Email & Password]
+    ExistingUser --> ValidateCredentials{Validate Credentials}
+    ValidateCredentials -->|Invalid| WrongCredentials[Show Error Message]
+    WrongCredentials -->|Try Again| ExistingUser
+    WrongCredentials -->|Forgot Password| ResetPassword[Password Reset Flow]
+    ResetPassword --> ValidateEmail{Validate Email}
+    ValidateEmail -->|Invalid| ShowError[Display Error]
+    ValidateEmail -->|Valid| SendResetEmail[Send Reset Link]
+    SendResetEmail --> NewPassword[Set New Password]
+    NewPassword --> SecurityCheck{Security Validation}
+    SecurityCheck -->|Pass| ExistingUser
+    SecurityCheck -->|Fail| ShowError
+    
+    %% Google Sign In Path
+    LoginChoice -->|Google Sign In| GoogleAuth[Google OAuth]
+    GoogleAuth --> ValidateGoogle{Validate Google Account}
+    ValidateGoogle -->|Invalid| ShowError
+    ValidateGoogle -->|Valid| CheckGoogleAccount{Check Account Status}
+    CheckGoogleAccount -->|First Time| SelectUserType[Select User Type]
+    CheckGoogleAccount -->|Existing| ValidateUserAccess
+    
+    %% New Sign Up Path
+    LoginChoice -->|New Sign Up| SelectUserType
+    SelectUserType --> ValidateUserType{Validate Type Selection}
+    ValidateUserType -->|Invalid| ShowError
+    ValidateUserType -->|Valid| RegistrationFlow
+
+    subgraph RegistrationFlow[User Registration Process]
+        BasicInfo[Collect Basic Info] --> ValidateInfo{Validate Info}
+        ValidateInfo -->|Invalid| BasicInfo
+        ValidateInfo -->|Valid| TypeSpecificInfo[Type-Specific Information]
+        TypeSpecificInfo --> ValidateTypeInfo{Validate Type Info}
+        ValidateTypeInfo -->|Invalid| TypeSpecificInfo
+        ValidateTypeInfo -->|Valid| EmailVerification[Email Verification]
+    end
+
+    EmailVerification --> CreateAccount[Create User Account]
+    CreateAccount --> SetupMFA[Setup 2FA/Security]
+    SetupMFA --> ValidateUserAccess
+    
+    %% Access Control and Dashboard Routing
+    ValidateCredentials -->|Valid| ValidateUserAccess{Validate User Access Rights}
+    
+    ValidateUserAccess --> CheckUserRole{Check User Role}
+    CheckUserRole -->|Invalid Access| AccessDenied[Access Denied]
+    AccessDenied --> LoginChoice
+
+    CheckUserRole -->|Company| ValidateCompany{Validate Company}
+    CheckUserRole -->|Agency| ValidateAgency{Validate Agency}
+    CheckUserRole -->|Staff| ValidateStaff{Validate Staff}
+
+    ValidateCompany -->|Invalid| AccessDenied
+    ValidateCompany -->|Valid| CompanyDash[Company Dashboard]
+    
+    ValidateAgency -->|Invalid| AccessDenied
+    ValidateAgency -->|Valid| AgencyDash[Agency Dashboard]
+    
+    ValidateStaff -->|Invalid| AccessDenied
+    ValidateStaff -->|Valid| StaffDash[Staff Dashboard]
+
+    %% Dashboard Sessions
+    CompanyDash --> CompanySession[Company Session]
+    AgencyDash --> AgencySession[Agency Session]
+    StaffDash --> StaffSession[Staff Session]
+
+    CompanySession --> CompanyActions{Company Actions}
+    CompanyActions -->|Continue| CompanySession
+    CompanyActions -->|Logout| SessionEnd[End Session]
+
+    AgencySession --> AgencyActions{Agency Actions}
+    AgencyActions -->|Continue| AgencySession
+    AgencyActions -->|Logout| SessionEnd
+
+    StaffSession --> StaffActions{Staff Actions}
+    StaffActions -->|Continue| StaffSession
+    StaffActions -->|Logout| SessionEnd
+
+    SessionEnd --> ValidateLogout{Validate Logout}
+    ValidateLogout -->|Success| End([End])
+    ValidateLogout -->|Fail| SecurityAlert[Trigger Security Alert]
+    SecurityAlert --> ForceLogout[Force Logout]
+    ForceLogout --> End
+
+    %% Styling
+    style Start fill:#90cdf4
+    style End fill:#90cdf4
+    style LoginChoice,CheckUserRole fill:#fbd38d
+    style WrongCredentials,ShowError,AccessDenied fill:#feb2b2
+    style CompanyDash,AgencyDash,StaffDash fill:#9ae6b4
+    style SecurityAlert fill:#fc8181
+    
+    classDef validationBox fill:#e2e8f0,stroke:#4a5568
+    class ValidateCredentials,ValidateGoogle,ValidateUserType,ValidateInfo,ValidateTypeInfo,ValidateUserAccess,ValidateCompany,ValidateAgency,ValidateStaff validationBox
+    
+    classDef sessionBox fill:#b2f5ea,stroke:#2c7a7b
+    class CompanySession,AgencySession,StaffSession sessionBox

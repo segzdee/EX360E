@@ -1,0 +1,53 @@
+functionsDirectory = "/Users/ms/nextjs-toolbox/Users/ms/nextjs-toolbox/netlify/functions"
+functionsDirectoryOrigin = "ui"
+redirectsOrigin = "config"
+headers = []
+
+[build]
+publish = "/Users/ms/nextjs-toolbox/.next"
+publishOrigin = "config"
+command = "npm run build"
+commandOrigin = "config"
+functions = "/Users/ms/nextjs-toolbox/Users/ms/nextjs-toolbox/netlify/functions"
+
+  [build.environment]
+
+  [build.processing]
+
+    [build.processing.css]
+
+    [build.processing.html]
+
+    [build.processing.images]
+
+    [build.processing.js]
+
+  [build.services]
+
+[functions]
+
+  [functions."*"]
+  included_files = [
+    "public/forms/**"
+  ]
+  node_bundler = "esbuild"
+
+[[plugins]]
+origin = "config"
+package = "@netlify/plugin-nextjs"
+pinned_version = "5.0.0"
+
+  [plugins.inputs]
+  nextConfigDir = "."
+
+[[redirects]]
+from = "/api/*"
+to = "/.netlify/functions/:splat"
+status = 200
+force = true
+
+  [redirects.query]
+
+  [redirects.conditions]
+
+  [redirects.headers]

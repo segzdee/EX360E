@@ -1,0 +1,19 @@
+.bravo-login-page{
+    padding: 100px 0px;
+}
+
+.bc-model{
+    display: none;
+}
+.icon-loading{
+    display: none;
+}
+@media(max-width: 767px){
+    .modal{
+        width: 100%;
+    }
+    #login-modal{
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+}

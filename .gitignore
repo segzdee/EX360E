@@ -1,0 +1,83 @@
+# Dependencies
+node_modules/
+*/node_modules/
+/FRONTEND/node_modules
+/BACKEND/node_modules
+/BRIDGE/node_modules
+
+# Security and backups
+security_backup_*/
+*_backup_*/
+security_fixes_backup_*/
+backups_*/
+firebase-debug.log
+verify-mysql.sh
+verify-credentials.sh
+DataALPHA*
+
+# Build directories
+/build/
+/dist/
+*/build/
+*/dist/
+
+# Environment files
+.env
+.env.*
+*.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Analysis and reports
+analysis_outputs/
+analysis_artifacts/
+codebase_analysis_report.txt
+project_analysis.txt
+project_map.txt
+project_structure_report.txt
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE and Editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+*.swn
+*.bak
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Firebase
+.firebase/
+firebase-debug.log
+.firebaserc
+
+# Testing
+/coverage
+*/coverage
+.nyc_output
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Script backups
+*backup*
+*backup*/

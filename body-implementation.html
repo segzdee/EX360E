@@ -1,0 +1,155 @@
+<!-- EXTRASTAFF360 Enterprise Platform Implementation -->
+<!-- Version: 2.0.0 -->
+<!-- Environment: Production -->
+
+<body>
+    <!-- Main Application Content -->
+    <div id="root"></div>
+    
+    <!-- Essential Script Loading -->
+    <script src="https://cdn.jsdelivr.net/npm/react@17/umd/react.production.min.js" 
+            integrity="sha384-..." 
+            crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/react-dom@17/umd/react-dom.production.min.js" 
+            integrity="sha384-..." 
+            crossorigin="anonymous"></script>
+    
+    <!-- Core Application Scripts -->
+    <script src="/static/js/main.min.js" defer></script>
+    <script src="/static/js/vendor.min.js" defer></script>
+    
+    <!-- Analytics and Tracking Implementation -->
+    <script type="text/javascript">
+        // Initialize Enterprise Analytics
+        class EXTRASTAFF360Analytics {
+            constructor() {
+                this.queue = [];
+                this.initialized = false;
+                this.init();
+            }
+            
+            init() {
+                this.initializeCore();
+                this.initializeTracking();
+                this.processQueue();
+                this.initialized = true;
+            }
+            
+            track(event, data) {
+                if (!this.initialized) {
+                    this.queue.push({ event, data });
+                    return;
+                }
+                
+                fetch('https://analytics.extrastaff360.com/events', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        event,
+                        data,
+                        timestamp: new Date().toISOString(),
+                        session: this.sessionId,
+                        user: this.userId,
+                        context: {
+                            url: window.location.href,
+                            referrer: document.referrer,
+                            userAgent: navigator.userAgent,
+                            screenResolution: `${window.screen.width}x${window.screen.height}`,
+                            viewportSize: `${window.innerWidth}x${window.innerHeight}`,
+                            performance: vitalsData
+                        }
+                    })
+                });
+            }
+            
+            initializeCore() {
+                this.sessionId = sessionStorage.getItem('sessionId') || 
+                    `es360_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+                sessionStorage.setItem('sessionId', this.sessionId);
+                
+                // Initialize session tracking
+                this.track('session_start', {
+                    type: sessionStorage.getItem('sessionId') ? 'continued' : 'new'
+                });
+            }
+            
+            initializeTracking() {
+                // Page View Tracking
+                this.trackPageView();
+                
+                // User Interaction Tracking
+                document.addEventListener('click', this.handleInteraction.bind(this));
+                
+                // Form Interaction Tracking
+                document.addEventListener('submit', this.handleFormSubmission.bind(this));
+            }
+            
+            trackPageView() {
+                const navigationEntry = performance.getEntriesByType('navigation')[0];
+                this.track('page_view', {
+                    url: window.location.href,
+                    loadTime: navigationEntry.loadEventEnd - navigationEntry.startTime,
+                    performanceMetrics: {
+                        fcp: vitalsData.FCP,
+                        lcp: vitalsData.LCP,
+                        cls: vitalsData.CLS
+                    }
+                });
+            }
+            
+            handleInteraction(event) {
+                const target = event.target.closest('[data-track]');
+                if (target) {
+                    this.track('user_interaction', {
+                        element: target.dataset.track,
+                        type: event.type,
+                        path: event.path.map(e => e.tagName).filter(Boolean)
+                    });
+                }
+            }
+            
+            handleFormSubmission(event) {
+                if (event.target.hasAttribute('data-track-form')) {
+                    this.track('form_submission', {
+                        formId: event.target.id,
+                        formName: event.target.name,
+                        success: true
+                    });
+                }
+            }
+            
+            processQueue() {
+                while (this.queue.length > 0) {
+                    const { event, data } = this.queue.shift();
+                    this.track(event, data);
+                }
+            }
+        }
+        
+        // Initialize Analytics
+        window.EXTRASTAFF360_Analytics = new EXTRASTAFF360Analytics();
+    </script>
+    
+    <!-- Real-time Performance Monitoring -->
+    <script type="text/javascript">
+        // Report Performance Metrics
+        window.addEventListener('load', () => {
+            window.performance.mark('loadComplete');
+            const loadTime = window.performance.measure(
+                'pageLoad',
+                'initStart',
+                'loadComplete'
+            ).duration;
+            
+            window.EXTRASTAFF360_Analytics.track('performance_metrics', {
+                loadTime,
+                vitals: vitalsData,
+                resources: performance.getEntriesByType('resource').map(r => ({
+                    name: r.name,
+                    duration: r.duration,
+                    transferSize: r.transferSize
+                }))
+            });
+        });
+    </script>
+</body>

@@ -1,0 +1,348 @@
+<!-- EXTRASTAFF360 Form System Architecture -->
+<!-- Version: 2.0.0 -->
+<!-- Implementation: Production -->
+
+<!-- Client Registration Form -->
+<form 
+  name="client-registration"
+  method="POST"
+  data-netlify="true"
+  data-netlify-honeypot="bot-field"
+  onSubmit="submit"
+  class="registration-form">
+  
+  <input type="hidden" name="form-name" value="client-registration" />
+  <div hidden>
+    <input name="bot-field" />
+  </div>
+
+  <!-- Organization Details -->
+  <div class="form-section">
+    <h3>Business Information</h3>
+    
+    <div class="form-group">
+      <label for="companyName">Company Name *</label>
+      <input
+        type="text"
+        id="companyName"
+        name="companyName"
+        required
+        minlength="2"
+        maxlength="100"
+        pattern="[A-Za-z0-9\s\-\.]+"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="businessType">Business Type *</label>
+      <select id="businessType" name="businessType" required>
+        <option value="">Select business type</option>
+        <option value="restaurant">Restaurant</option>
+        <option value="hotel">Hotel</option>
+        <option value="catering">Catering Service</option>
+        <option value="event">Event Management</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Contact Information -->
+  <div class="form-section">
+    <h3>Primary Contact</h3>
+    
+    <div class="form-group">
+      <label for="contactName">Contact Person *</label>
+      <input
+        type="text"
+        id="contactName"
+        name="contactName"
+        required
+        minlength="2"
+        maxlength="100"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="email">Business Email *</label>
+      <input
+        type="email"
+        id="email"
+        name="email"
+        required
+        pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
+      />
+    </div>
+
+    <div class="form-group">
+      <label for="phone">Contact Number *</label>
+      <input
+        type="tel"
+        id="phone"
+        name="phone"
+        required
+        pattern="[0-9\-\+\s]+"
+      />
+    </div>
+  </div>
+
+  <!-- Location Information -->
+  <div class="form-section">
+    <h3>Business Location</h3>
+    
+    <div class="form-group">
+      <label for="address">Street Address *</label>
+      <input
+        type="text"
+        id="address"
+        name="address"
+        required
+      />
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="city">City *</label>
+        <input
+          type="text"
+          id="city"
+          name="city"
+          required
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="postcode">Postal Code *</label>
+        <input
+          type="text"
+          id="postcode"
+          name="postcode"
+          required
+          pattern="[0-9A-Za-z\s\-]+"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Staff Requirements -->
+  <div class="form-section">
+    <h3>Staffing Needs</h3>
+    
+    <div class="form-group">
+      <label for="staffingFrequency">Typical Staffing Frequency</label>
+      <select id="staffingFrequency" name="staffingFrequency">
+        <option value="daily">Daily</option>
+        <option value="weekly">Weekly</option>
+        <option value="monthly">Monthly</option>
+        <option value="seasonal">Seasonal</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Staff Types Needed</label>
+      <div class="checkbox-group">
+        <label>
+          <input type="checkbox" name="staffTypes[]" value="servers" />
+          Servers
+        </label>
+        <label>
+          <input type="checkbox" name="staffTypes[]" value="bartenders" />
+          Bartenders
+        </label>
+        <label>
+          <input type="checkbox" name="staffTypes[]" value="chefs" />
+          Chefs
+        </label>
+        <label>
+          <input type="checkbox" name="staffTypes[]" value="hostess" />
+          Hostess
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Compliance Section -->
+  <div class="form-section">
+    <h3>Compliance</h3>
+    
+    <div class="form-group">
+      <label>
+        <input
+          type="checkbox"
+          name="termsAccepted"
+          required
+        />
+        I accept the Terms of Service and Privacy Policy *
+      </label>
+    </div>
+
+    <div class="form-group">
+      <label>
+        <input
+          type="checkbox"
+          name="dataConsent"
+          required
+        />
+        I consent to EXTRASTAFF360 processing my data *
+      </label>
+    </div>
+  </div>
+
+  <!-- Form Submission -->
+  <div class="form-actions">
+    <button type="submit" class="submit-button">
+      Complete Registration
+    </button>
+    <button type="reset" class="reset-button">
+      Reset Form
+    </button>
+  </div>
+
+  <!-- Form Status Messages -->
+  <div class="form-status" aria-live="polite">
+    <div class="success-message" hidden>
+      Registration submitted successfully!
+    </div>
+    <div class="error-message" hidden>
+      Error submitting form. Please try again.
+    </div>
+  </div>
+</form>
+
+<!-- Corresponding CSS for Form Styling -->
+<style>
+.registration-form {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.form-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.checkbox-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.5rem;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.form-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.submit-button,
+.reset-button {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submit-button {
+  background-color: #2196f3;
+  color: white;
+}
+
+.reset-button {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.submit-button:hover {
+  background-color: #1976d2;
+}
+
+.reset-button:hover {
+  background-color: #e0e0e0;
+}
+
+.form-status {
+  margin-top: 1rem;
+  padding: 1rem;
+  border-radius: 4px;
+}
+
+.success-message {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.error-message {
+  background-color: #ffebee;
+  color: #c62828;
+}
+</style>
+
+<!-- Form Validation and Submission JavaScript -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const form = document.querySelector('.registration-form');
+  const successMessage = document.querySelector('.success-message');
+  const errorMessage = document.querySelector('.error-message');
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    try {
+      const formData = new FormData(form);
+      const response = await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams(formData).toString()
+      });
+
+      if (response.ok) {
+        successMessage.hidden = false;
+        errorMessage.hidden = true;
+        form.reset();
+      } else {
+        throw new Error('Form submission failed');
+      }
+    } catch (error) {
+      console.error('Form submission error:', error);
+      successMessage.hidden = true;
+      errorMessage.hidden = false;
+    }
+  });
+});
+</script>

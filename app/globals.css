@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer utilities {
+  .animate-marquee {
+    animation: marquee 30s linear infinite;
+  }
+
+  @keyframes marquee {
+    0% {
+      transform: translateX(0%);
+    }
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+}
+
+@layer base {
+  :root {
+    --primary: 214 100% 35%; /* #0047B3 */
+    --primary-hover: 217 100% 45%; /* #005CE6 */
+  }
+}
+
+/* Add these new utility classes for the Ticker */
+.ticker-item {
+  display: inline-block;
+  padding: 0 1rem;
+}
+
+.ticker-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.ticker-container {
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.ticker-content {
+  display: inline-block;
+  white-space: nowrap;
+  padding-left: 100%;
+  animation: ticker 30s linear infinite;
+}
+
+@keyframes ticker {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-100%, 0, 0);
+  }
+}
+

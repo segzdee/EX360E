@@ -1,0 +1,125 @@
+// EXTRASTAFF360 Rating and Review System
+// Version: 2.0.0
+// Service: Performance Metrics
+
+import { RatingValidator } from './validators';
+import { MetricsCollector } from './metrics';
+import { NotificationService } from './notifications';
+import { MLService } from './ml-service';
+
+interface Review {
+  reviewId: string;
+  shiftId: string;
+  reviewerId: string;
+  revieweeId: string;
+  reviewType: ReviewType;
+  rating: number;
+  criteria: {
+    punctuality: number;
+    professionalism: number;
+    skillLevel: number;
+    communication: number;
+    overall: number;
+  };
+  feedback: string;
+  timestamp: Date;
+  status: ReviewStatus;
+  metadata: {
+    shift_duration: number;
+    shift_type: string;
+    location: string;
+  };
+}
+
+enum ReviewType {
+  CLIENT_TO_STAFF = 'CLIENT_TO_STAFF',
+  STAFF_TO_CLIENT = 'STAFF_TO_CLIENT',
+  AGENCY_TO_STAFF = 'AGENCY_TO_STAFF',
+  CLIENT_TO_AGENCY = 'CLIENT_TO_AGENCY'
+}
+
+enum ReviewStatus {
+  PENDING = 'PENDING',
+  SUBMITTED = 'SUBMITTED',
+  DISPUTED = 'DISPUTED',
+  RESOLVED = 'RESOLVED'
+}
+
+class RatingService {
+  private readonly validator: RatingValidator;
+  private readonly metrics: MetricsCollector;
+  private readonly notification: NotificationService;
+  private readonly mlService: MLService;
+
+  constructor() {
+    this.validator = new RatingValidator();
+    this.metrics = new MetricsCollector();
+    this.notification = new NotificationService();
+    this.mlService = new MLService();
+  }
+
+  async submitReview(reviewData: Partial<Review>): Promise<Review> {
+    try {
+      // Validate review data
+      await this.validator.validateReview(reviewData);
+
+      // Calculate overall rating
+      const overallRating = this.calculateOverallRating(reviewData.criteria);
+
+      // Create review record
+      const review: Review = {
+        ...reviewData,
+        rating: overallRating,
+        timestamp: new Date(),
+        status: ReviewStatus.SUBMITTED
+      };
+
+      // Process through ML for sentiment analysis
+      const sentimentAnalysis = await this.mlService.analyzeSentiment(review.feedback);
+
+      // Update user metrics
+      await this.updateUserMetrics(review);
+
+      // Send notifications
+      await this.notification.sendReviewNotification(review);
+
+      // Record metrics
+      await this.metrics.recordReview(review);
+
+      return review;
+    } catch (error) {
+      await this.handleReviewError(error, reviewData);
+      throw error;
+    }
+  }
+
+  private calculateOverallRating(criteria: Review['criteria']): number {
+    const weights = {
+      punctuality: 0.25,
+      professionalism: 0.25,
+      skillLevel: 0.25,
+      communication: 0.25
+    };
+
+    return Object.entries(weights).reduce(
+      (sum, [key, weight]) => sum + criteria[key] * weight,
+      0
+    );
+  }
+
+  async getUserRating(userId: string): Promise<{
+    averageRating: number;
+    totalReviews: number;
+    breakdown: any;
+  }> {
+    try {
+      const reviews = await this.metrics.getUserReviews(userId);
+      
+      const averageRating = reviews.reduce(
+        (sum, review) => sum + review.rating,
+        0
+      ) / reviews.length;
+
+      const breakdown = this.calculateRatingBreakdown(reviews);
+
+      

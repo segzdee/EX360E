@@ -1,0 +1,102 @@
+<!-- EXTRASTAFF360 Enterprise Platform Configuration -->
+<!-- Version: 2.0.0 -->
+<!-- Environment: Production -->
+
+<head>
+    <!-- Essential Meta Configuration -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="EXTRASTAFF360 - Enterprise Staffing Solutions Platform">
+    
+    <!-- Security Headers -->
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self' https://extrastaff360.com;
+        script-src 'self' 'unsafe-inline' 'unsafe-eval' https://analytics.extrastaff360.com https://www.google-analytics.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+        img-src 'self' data: https: blob:;
+        font-src 'self' https://fonts.gstatic.com;
+        connect-src 'self' https://*.extrastaff360.com wss://*.extrastaff360.com;
+        frame-ancestors 'none';
+        form-action 'self';
+    ">
+    
+    <!-- Performance Optimization -->
+    <link rel="preconnect" href="https://analytics.extrastaff360.com">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    
+    <!-- PWA Configuration -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#2196F3">
+    <link rel="apple-touch-icon" href="/icons/icon-192x192.png">
+    
+    <!-- Primary Analytics Implementation -->
+    <script type="text/javascript">
+        window.EXTRASTAFF360_Config = {
+            environment: 'production',
+            version: '2.0.0',
+            apiEndpoint: 'https://api.extrastaff360.com',
+            wsEndpoint: 'wss://realtime.extrastaff360.com',
+            features: {
+                analytics: true,
+                errorTracking: true,
+                performanceMonitoring: true
+            }
+        };
+        
+        // Initialize Performance Monitoring
+        window.performance.mark('initStart');
+        
+        // Analytics Configuration
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-EXTRASTAFF360', {
+            'send_page_view': false,
+            'user_id': '${userId}',
+            'custom_map': {
+                'dimension1': 'user_type',
+                'dimension2': 'subscription_level'
+            }
+        });
+    </script>
+    
+    <!-- Error Tracking Configuration -->
+    <script type="text/javascript">
+        window.addEventListener('error', function(e) {
+            fetch('https://analytics.extrastaff360.com/error', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: e.message,
+                    source: e.filename,
+                    lineno: e.lineno,
+                    colno: e.colno,
+                    error: e.error?.stack,
+                    timestamp: new Date().toISOString(),
+                    url: window.location.href,
+                    userAgent: navigator.userAgent
+                })
+            });
+        });
+    </script>
+    
+    <!-- Performance Monitoring -->
+    <script type="text/javascript">
+        // Core Web Vitals Monitoring
+        let vitalsData = {};
+        
+        new PerformanceObserver((entryList) => {
+            for (const entry of entryList.getEntries()) {
+                vitalsData[entry.name] = entry.value;
+            }
+        }).observe({ entryTypes: ['largest-contentful-paint'] });
+        
+        new PerformanceObserver((entryList) => {
+            for (const entry of entryList.getEntries()) {
+                vitalsData[entry.name] = entry.value;
+            }
+        }).observe({ entryTypes: ['first-input', 'layout-shift'] });
+    </script>
+</head>

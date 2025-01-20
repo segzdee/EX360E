@@ -1,0 +1,69 @@
+#!/bin/bash
+
+# EXTRASTAFF360 Database Migration Script
+# Version: 1.0.0
+
+set -euo pipefail
+
+# Configuration
+DB_HOST="127.0.0.1"
+DB_PORT="3306"
+DB_NAME="extrastaff360"
+DB_USER="segzdee"
+DB_PASS="kiyingi8844"
+BACKUP_DIR="./database/backups"
+MIGRATION_DIR="./database/migrations"
+TIMESTAMP=$(date +%Y%m%d_%H%M%S)
+
+# Logging Configuration
+LOG_FILE="migration_${TIMESTAMP}.log"
+
+# Logging function
+log() {
+    echo "[$(date +'%Y-%m-%d %H:%M:%S')] $1" | tee -a "$LOG_FILE"
+}
+
+# Create backup
+create_backup() {
+    log "Creating database backup..."
+    mkdir -p "$BACKUP_DIR"
+    mysqldump -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" > \
+        "${BACKUP_DIR}/backup_${TIMESTAMP}.sql"
+}
+
+# Run migrations
+run_migrations() {
+    log "Running database migrations..."
+    for migration in "$MIGRATION_DIR"/*.sql; do
+        if [ -f "$migration" ]; then
+            log "Applying migration: $(basename "$migration")"
+            mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < "$migration"
+        fi
+    done
+}
+
+# Verify database integrity
+verify_integrity() {
+    log "Verifying database integrity..."
+    mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" \
+        -e "CHECK TABLE users, client_profiles, staff_profiles, agency_profiles, shifts, transactions"
+}
+
+# Main execution
+main() {
+    log "Starting database migration process..."
+    
+    # Create backup
+    create_backup
+    
+    # Run migrations
+    run_migrations
+    
+    # Verify integrity
+    verify_integrity
+    
+    log "Migration completed successfully"
+}
+
+# Execute main function
+main "$@"

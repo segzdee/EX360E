@@ -1,0 +1,31 @@
+@import "variables";
+@import "base";
+@import "review";
+@import "404";
+@import "block";
+@import "notification";
+@import "extrastaff";
+@import "typo";
+
+//Modules Media
+@import "../../../resources/module/media/admin/scss/browser";
+@import "location/smart-search";
+
+.btn-box .bookmark-btn{
+    &.active{
+        opacity: 1;
+        visibility: visible;
+        background: rgb(249 171 0 / 80%);
+        color: white;
+    }
+}
+.job-search-form-two{
+    .smart-search, .input-search{
+        &:after{
+            top: auto;
+            bottom: 5px;
+            right: 50px;
+        }
+    }
+}
+@import "styling";

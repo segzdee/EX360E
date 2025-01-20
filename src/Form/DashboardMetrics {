@@ -1,0 +1,17 @@
+interface DashboardMetrics {
+  performance: {
+    responseTime: number;    // milliseconds
+    errorRate: number;       // percentage
+    uptime: number;         // percentage
+  };
+  userEngagement: {
+    activeUsers: number;
+    sessionDuration: number;
+    bounceRate: number;
+  };
+  businessMetrics: {
+    conversionRate: number;
+    revenueGenerated: number;
+    activeShifts: number;
+  };
+}

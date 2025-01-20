@@ -1,0 +1,60 @@
+graph TB
+    subgraph Client_Journey
+        C1[Client Registration] --> C2[Profile Verification]
+        C2 --> C3[Account Activation]
+        C3 --> C4[Post Shift Requirements]
+        C4 --> C5[Staff Selection]
+        C5 --> C6[Shift Management]
+        C6 --> C7[Payment Processing]
+        C7 --> C8[Performance Review]
+    end
+
+    subgraph Staff_Journey
+        S1[Staff Registration] --> S2[Background Check]
+        S2 --> S3[Skills Verification]
+        S3 --> S4[Profile Activation]
+        S4 --> S5[Shift Discovery]
+        S5 --> S6[Shift Application]
+        S6 --> S7[Work Execution]
+        S7 --> S8[Payment Receipt]
+        S8 --> S9[Performance Rating]
+    end
+
+    subgraph Agency_Journey
+        A1[Agency Registration] --> A2[License Verification]
+        A2 --> A3[Account Activation]
+        A3 --> A4[Staff Pool Management]
+        A4 --> A5[Shift Assignment]
+        A5 --> A6[Performance Monitoring]
+        A6 --> A7[Commission Management]
+    end
+
+    %% Cross-entity relationships
+    C4 --> S5
+    S6 --> C5
+    C8 --> S9
+    A4 --> S1
+    A5 --> C5
+    C7 --> A7
+
+    %% System integrations
+    subgraph Platform_Services
+        PS1[Authentication Service]
+        PS2[Payment Gateway]
+        PS3[Matching Algorithm]
+        PS4[Notification System]
+        PS5[Analytics Engine]
+    end
+
+    %% Service connections
+    C1 --> PS1
+    S1 --> PS1
+    A1 --> PS1
+    C7 --> PS2
+    S8 --> PS2
+    C5 --> PS3
+    S5 --> PS3
+    PS4 --> C6
+    PS4 --> S7
+    PS5 --> C8
+    PS5 --> S9
